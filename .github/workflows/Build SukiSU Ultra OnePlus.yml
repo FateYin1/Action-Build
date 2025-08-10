@@ -1078,8 +1078,6 @@ jobs:
           prerelease: false  # 非预发布
           files: |
             ./AnyKernel3/*.zip  # 上传AnyKernel3刷包
-            ./AnyKernel3/*.apk  # 上传SukiSU管理器APK（如有）
-            ./ZRAM-Module/*.zip  # 上传ZRAM模块（如有）
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动注入的仓库令牌
 
