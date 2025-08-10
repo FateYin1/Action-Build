@@ -1083,9 +1083,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动注入的仓库令牌
 
-      - name: Print Release URL
-        if: ${{ steps.create_release.outputs.url != '' }}
-        run: echo "发布成功: ${{ steps.create_release.outputs.url }}"
 
 
 
