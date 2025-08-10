@@ -1035,6 +1035,7 @@ jobs:
             fi
           else
             echo "未找到 zram.ko 文件，可能是未支持的内核版本或者未成功构建"
+            
             echo "upload=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -1048,3 +1049,46 @@ jobs:
 
       - name: Post-build Disk Check
         run: df -h
+
+
+
+
+
+
+
+
+
+
+# 发布到 GitHub Releases（在所有构建和上传步骤之后）
+      - name: Create GitHub Release
+        id: create_release
+        if: ${{ success() }}  # 仅当所有步骤成功时执行
+        uses: softprops/action-gh-release@v2  # 现代Release Action，支持多资产上传
+        with:
+          tag_name: SukiSU-Ultra-v${{ env.KSUVER }}-${{ github.sha }}  # 版本标签（基于KSU版本+ commit哈希）
+          name: SukiSU Ultra Build ${{ env.KSUVER }} for ${{ steps.extract_info.outputs.value }}
+          body: |
+            ## 构建信息
+            - 设备: ${{ steps.extract_info.outputs.value }}
+            - 内核版本: ${{ env.KERNEL_VERSION }}
+            - SukiSU 版本: v${{ env.KSUVER }}
+            - 构建时间: ${{ env.KBUILD_BUILD_TIMESTAMP }}
+            - 特性: ${{ github.event.inputs.FAST_BUILD == 'true' && '极速构建 ' || '' }}${{ github.event.inputs.VFS == 'true' && 'VFS ' || '' }}${{ github.event.inputs.ZRAM == 'true' && 'ZRAM ' || '' }}${{ github.event.inputs.KPM == 'true' && 'KPM ' || '' }}
+          draft: false  # 非草稿
+          prerelease: false  # 非预发布
+          files: |
+            ./AnyKernel3/*.zip  # 上传AnyKernel3刷包
+            ./AnyKernel3/*.apk  # 上传SukiSU管理器APK（如有）
+            ./ZRAM-Module/*.zip  # 上传ZRAM模块（如有）
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动注入的仓库令牌
+
+      - name: Print Release URL
+        if: ${{ steps.create_release.outputs.url != '' }}
+        run: echo "发布成功: ${{ steps.create_release.outputs.url }}"
+
+
+
+
+
+
